@@ -19,7 +19,7 @@ def main(logname):
 
 if __name__ == "__main__":
 	if sys.argv[1] == 'start':
-		main("/home/pi/temp.log")
+		main("/home/pi/temp.csv")
 	else:
 		sys.exit(0)
 
