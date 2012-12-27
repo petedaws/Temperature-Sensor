@@ -34,24 +34,26 @@ def main(logname,ave_window):
 		tempstr = serialport.readline(None).strip()
 		if not all(c in string.printable for c in tempstr):
 			continue
-		temp = [float(i) for i in tempstr.split(',')]
-		temps.append(calibrate(temp))
+		try:
+			temp = [float(i) for i in tempstr.split(',')]
+			temps.append(calibrate(temp))
+		except:
+			continue
 
 		if len(temps) > ave_window:
 			average_result = average(temps)
 			log = open(logname,'a')
 			tm = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 			log.write("".join((tm,',',",".join("%0.1f" % x for x in average_result),'\n')))
-			print "average " + "".join((tm,',',",".join("%0.1f" % x for x in average_result),'\n'))
 			log.close()
 			temps = []
 
 if __name__ == "__main__":
 	if sys.argv[1] == 'start':
 		if platform.system() == 'Windows':
-			main("temp.csv",30)
+			main("temp.csv",300)
 		else:
-			main("/home/pi/temp.csv",30)
+			main("/home/peter/Temperature-Sensor/temp.csv",300)
 	else:
 		sys.exit(0)
 
