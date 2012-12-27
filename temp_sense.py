@@ -9,9 +9,11 @@ import string
 def main(logname):
 	serialport = serial.Serial("/dev/ttyUSB0", 9600)
 	while(True):
-		temps = serialport.readline(None).strip()
+		tempstr = serialport.readline(None).strip()
 		if not all(c in string.printable for c in temps):
 			continue
+		temps = [float(i) for i in tempstr.split(',')]
+		temps_calibrate = 
 		log = open(logname,'a')
 		tm = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 		log.write("".join((tm,',',temps,'\n')))
