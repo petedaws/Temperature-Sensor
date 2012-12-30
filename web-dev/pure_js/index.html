@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highstock Example</title>
+
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script type="text/javascript">
+$(function() {
+
+	var seriesOptions = [],
+		yAxisOptions = [],
+		seriesCounter = 0,
+		names = ['s0', 's1', 's2'],
+		colors = Highcharts.getOptions().colors;
+		Highcharts.setOptions({
+			global: {
+			useUTC: false
+			}
+		});
+
+	$.each(names, function(i, name) {
+
+		$.getJSON(name +'.json').pipe(function(data) {
+
+			seriesOptions[i] = {
+		        name: name,
+		        data: data,
+		        tooltip: {
+		        	valueDecimals: 1,
+		        	valueSuffix: '°C'
+		        }
+		    };
+
+			// As we're loading the data asynchronously, we don't know what order it will arrive. So
+			// we keep a counter and create the chart when all the data is loaded.
+			seriesCounter++;
+
+			if (seriesCounter == names.length) {
+				createChart();
+			}
+		});
+	});
+	// create the chart when all data is loaded
+	function createChart() {
+
+		// Create the chart
+		var chart = new Highcharts.StockChart({
+		    chart: {
+		        renderTo: 'container',
+				events: {
+					load: function(chart) {
+						this.setTitle(null, {
+							//text: 'Built chart at '+ (new Date() - start) +'ms'
+						});
+					}
+				},
+				zoomType: 'x'
+		    },
+	
+		    rangeSelector: {
+		        buttons: [{
+		            type: 'day',
+		            count: 3,
+		            text: '3d'
+		        }, {
+		            type: 'week',
+		            count: 1,
+		            text: '1w'
+		        }, {
+		            type: 'month',
+		            count: 1,
+		            text: '1m'
+		        }, {
+		            type: 'month',
+		            count: 6,
+		            text: '6m'
+		        }, {
+		            type: 'year',
+		            count: 1,
+		            text: '1y'
+		        }, {
+		            type: 'all',
+		            text: 'All'
+		        }],
+		        selected: 3
+		    },
+	
+			yAxis: {
+				title: {
+					text: 'Temperature (°C)'
+				}
+			},
+	
+		    title: {
+				text: 'Temperature Sensor Readings'
+			},
+	
+			series: seriesOptions
+	
+		});
+	}
+});
+
+		</script>
+	</head>
+	<body>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+
+<div id="container" style="height: 500px; min-width: 500px"></div>
+	</body>
+</html>
