@@ -10,7 +10,7 @@ import csv
 import datetime
 import json
 
-calibrations = {0:0.0, 1:0.0, 2: 0.0}
+calibrations = {0:-2.0, 1:-1.5, 2: -3.0}
 
 def output_json(datafile):
 	csvrdr  = csv.reader(open(datafile,'rb'))
