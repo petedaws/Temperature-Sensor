@@ -10,7 +10,7 @@ import csv
 import datetime
 import json
 
-calibrations = {0:-2.0, 1:-1.5, 2: -3.0}
+calibrations = {0:-4.4, 1:-1.2, 2: -2.2, 3: -3.0}
 
 def output_json(datafile):
 	csvrdr  = csv.reader(open(datafile,'rb'))
@@ -27,9 +27,9 @@ def output_json(datafile):
 		s1.append([(long(s)*1000),float(row[2])])
 		s2.append([(long(s)*1000),float(row[3])])
 		s3.append([(long(s)*1000),float(row[4])])
-		data = {'s0':s0,'s1':s1,'s2':s2}
+		data = {'s0':s0,'s1':s1,'s2':s2,'s3':s3}
 	output_file = open('/var/www/temp_data.json','wb')
-	output_file.write(json.dumps(data,indent=4))
+	output_file.write(json.dumps(data))
 	output_file.close()
 
 def average(data):

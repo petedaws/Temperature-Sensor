@@ -12,7 +12,7 @@ void print_temps()
     Serial.print(temp[i]);
     Serial.print(",");
   }
-  Serial.print(temp[4]);
+  Serial.print(temp[3]);
   Serial.println();
 }
 
