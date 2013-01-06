@@ -27,7 +27,7 @@ def output_json(datafile):
 		s1.append([(long(s)*1000),float(row[2])])
 		s2.append([(long(s)*1000),float(row[3])])
 		s3.append([(long(s)*1000),float(row[4])])
-		data = {'s0':s0,'s1':s1,'s2':s2,'s3':s3}
+		data = {'Outside':s0,'Kitchen':s1,'Ceiling':s2,'Study':s3}
 	output_file = open('/var/www/temp_data.json','wb')
 	output_file.write(json.dumps(data))
 	output_file.close()
