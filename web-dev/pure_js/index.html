@@ -19,7 +19,14 @@ $(function() {
 			}
 		});
 
-	$.getJSON(datafile).pipe(function(obj) {
+	$.ajax({
+  url: datafile,
+  async: false,
+  dataType: 'json',
+  success: function (response) {
+    // do stuff with response.
+  }
+}).pipe(function(obj) {
 		$.each(obj, function(name, data) {
 			seriesOptions[seriesCounter] = {
 				name: name,
