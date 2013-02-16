@@ -132,7 +132,7 @@ def init():
 	create_tables(c)
 	init_names(c)
 	data = populate_raw_data(c)
-	populate_index_tables(c,data)
+	#populate_index_tables(c,data)
 	conn.commit()
 	conn.close()
 	
