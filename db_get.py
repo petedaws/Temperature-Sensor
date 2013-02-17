@@ -20,10 +20,11 @@ def query_next(c):
 		start = datetime.datetime.fromtimestamp(result[0][0])
 	end = get_next_10_min_block(start)
 	result = query_raw_range(c,start,end)
-	pprint.pprint(result)
 	if len(result) > 0:
 		process_raw(c,result)
 		return True
+	elif len(result) == 1:
+		return False
 	else:
 		return False
 
@@ -58,7 +59,7 @@ def init():
 	c = conn.cursor()
 	i = 0
 	while (query_next(c)):
-		print "commit" + str(i)
+		print "commit " + str(i)
 		i = i+1
 	conn.commit()
 	conn.close()
