@@ -20,7 +20,7 @@ def query_next(c):
 		start = datetime.datetime.fromtimestamp(result[0][0])
 	end = get_next_10_min_block(start)
 	result = query_raw_range(c,start,end)
-	if len(result) > 0:
+	if len(result) > 1:
 		process_raw(c,result)
 		return True
 	elif len(result) == 1:
