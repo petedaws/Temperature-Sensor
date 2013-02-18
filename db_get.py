@@ -15,18 +15,28 @@ def query_next(c):
 	c.execute('SELECT * from ten_minute_temperature_measurements where date = (SELECT max(date) from ten_minute_temperature_measurements)')
 	result = c.fetchall()
 	if len(result) == 0:
+		#no entries currently exist in the index table
 		start = get_date_of_first_raw_entry(c)
 	else:
 		start = datetime.datetime.fromtimestamp(result[0][0])
 	end = get_next_10_min_block(start)
-	result = query_raw_range(c,start,end)
-	if len(result) > 1:
-		process_raw(c,result)
+	if end < get_date_of_last_raw_entry(c):
+		result = query_raw_range(c,start,end)
+		if len(result) > 1:
+			process_raw(c,result)
+		else:
+			insert_null(c,end)
 		return True
-	elif len(result) == 1:
-		return False
 	else:
 		return False
+
+def insert_null(c,end):
+	c.execute('INSERT INTO ten_minute_temperature_measurements VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % (
+			time.mktime(end.timetuple()),
+			'NULL','NULL','NULL','NULL',
+			'NULL','NULL','NULL','NULL',
+			'NULL','NULL','NULL','NULL',
+			'NULL','NULL','NULL','NULL',))
 
 def process_raw(c,result):
 	s0 = [i[1] for i in result]
@@ -41,10 +51,16 @@ def process_raw(c,result):
 				result[0][3],result[-1][3],min(s2),max(s2),
 				result[0][4],result[-1][4],min(s3),max(s3),))
 
+
 def get_date_of_first_raw_entry(c):
 	c.execute('SELECT * from raw_temperature_measurements where date = (SELECT min(date) from raw_temperature_measurements)')
 	timestamp_tuple = datetime.datetime.fromtimestamp(c.fetchall()[0][0])
 	return get_next_10_min_block(timestamp_tuple)
+	
+def get_date_of_last_raw_entry(c):
+	c.execute('SELECT * from raw_temperature_measurements where date = (SELECT max(date) from raw_temperature_measurements)')
+	timestamp_tuple = datetime.datetime.fromtimestamp(c.fetchall()[0][0])
+	return timestamp_tuple
 	
 def get_next_10_min_block(t):
 	add_minutes = 10-(t.timetuple()[4]%10)
