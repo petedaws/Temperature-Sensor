@@ -63,7 +63,7 @@ def init_names(c):
 			 
 			 
 def init():
-	conn = sqlite3.connect('example.db')
+	conn = sqlite3.connect('temp.db')
 	c = conn.cursor()
 	create_tables(c)
 	init_names(c)

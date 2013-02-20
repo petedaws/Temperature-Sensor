@@ -8,6 +8,7 @@ import string
 import platform
 import csv
 import datetime
+import sqlite3
 
 calibrations = {0:-4.4, 1:-1.2, 2: -2.2, 3: -3.0}
 
@@ -32,6 +33,8 @@ def main(logname,ave_window):
 	else:
 		serialport = serial.Serial("/dev/ttyUSB0", 9600)
 	temps = []
+	conn = sqlite3.connect('temp.db')
+	c = conn.cursor()
 	while(True):
 		tempstr = serialport.readline(None).strip()
 		if not all(c in string.printable for c in tempstr):
@@ -48,7 +51,10 @@ def main(logname,ave_window):
 			tm = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 			log.write("".join((tm,',',",".join("%0.1f" % x for x in average_result),'\n')))
 			log.close()
+			c.execute("INSERT INTO raw_temperature_measurements VALUES (%d,%f,%f,%f,%f)" % (int(tm),average_result[0],average_result[1],average_result[2],average_result[3])))
+			conn.commit()
 			temps = []
+	conn.close()
 
 if __name__ == "__main__":
 	if sys.argv[1] == 'start':

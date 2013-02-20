@@ -95,25 +95,19 @@ def get_date_of_last_entry(c,table):
 		return timestamp_tuple
 	
 def get_next_time_block(t,size):
-	if size == 'mins':
-		add_minutes = 10-(t.timetuple()[4]%10)
-		if add_minutes == 0:
-			add_mintues = 10
-		delta = datetime.timedelta(minutes=add_minutes)
-	elif size == 'hr':
-		delta = datetime.timedelta(hours=1)
+	delta = datetime.timedelta(**size)
 	return t+delta
 	
 
 def init():
-	conn = sqlite3.connect('example.db')
+	conn = sqlite3.connect('temp.db')
 	c = conn.cursor()
 	i = 0
-	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements','mins')):
+	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',{'minutes':10})):
 		print "commit 10mins " + str(i)
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements','hr')):
+	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',{'hours':1})):
 		print "commit hour " + str(i)
 		i = i+1
 	conn.commit()
