@@ -106,21 +106,36 @@ def init():
 	c = conn.cursor()
 	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),10)):
 		None
+	conn.commit()
+	
 	while (populate_index_table(c,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),1)):
 		None
+	conn.commit()
+	
 	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),1)):
 		None
+	conn.commit()
+	
 	while (populate_index_table(c,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),1)):
 		None
+	conn.commit()
+	
 	while (populate_index_table(c,'twelve_hour_temperature_measurements','six_hour_temperature_measurements',datetime.timedelta(hours=12),1)):
 		None
+	conn.commit()
+	
 	while (populate_index_table(c,'daily_temperature_measurements','twelve_hour_temperature_measurements',datetime.timedelta(days=1),1)):
 		None
-	while (populate_index_table(c,'weekly_temperature_measurements','daily_hour_temperature_measurements',datetime.timedelta(days=7),1)):
-		None
-	while (populate_index_table(c,'monthly_temperature_measurements','daily_hour_temperature_measurements',datetime.timedelta(days=30),1)):
+	conn.commit()
+	
+	while (populate_index_table(c,'weekly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=7),1)):
 		None
 	conn.commit()
+	
+	while (populate_index_table(c,'monthly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=30),1)):
+		None
+	conn.commit()
+	
 	conn.close()
 	
 if __name__ == "__main__":
