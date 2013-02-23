@@ -14,7 +14,7 @@ def query_range(c,table,start,end):
 	c.execute('SELECT * from %s where date between %d and %d' % (table,start_timestamp,end_timestamp))
 	return c.fetchall()
 	
-def populate_index_table(c,process_table,source_table,time_block,expected_result_size):
+def populate_index_table(c,process_table,source_table,time_block,min_result_size):
 	start = get_date_of_last_entry(c,process_table)
 	if start is None:
 		#no entries currently exist in the index table
@@ -24,7 +24,7 @@ def populate_index_table(c,process_table,source_table,time_block,expected_result
 	end = start+time_block
 	if end+time_block < get_date_of_last_entry(c,source_table):
 		result = query_range(c,source_table,start,end)
-		if len(result) >= expected_result_size:
+		if len(result) >= min_result_size:
 			# did we query the raw table or and index table?
 			if len(result[0]) > 5:
 				process_index(c,process_table,result)
@@ -104,27 +104,34 @@ def init():
 	conn = sqlite3.connect('temp.db')
 	c = conn.cursor()
 	i = 0
-	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),20)):
+	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),10)):
 		print "commit 10mins " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),3)):
+	while (populate_index_table(c,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),1)):
 		print "commit hour " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),6)):
+	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),1)):
 		print "commit half_hour " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),6)):
+	while (populate_index_table(c,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),1)):
 		print "commit six_hour " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'twelve_hour_temperature_measurements','six_hour_temperature_measurements',datetime.timedelta(hours=12),2)):
+	while (populate_index_table(c,'twelve_hour_temperature_measurements','six_hour_temperature_measurements',datetime.timedelta(hours=12),1)):
 		print "commit twelve_hour " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'daily_temperature_measurements','twelve_hour_temperature_measurements',datetime.timedelta(days=1),2)):
+	while (populate_index_table(c,'daily_temperature_measurements','twelve_hour_temperature_measurements',datetime.timedelta(days=1),1)):
+		print "commit day " + str(i) ##Debug
+		i = i+1
+	i = 0
+	while (populate_index_table(c,'weekly_temperature_measurements','daily_hour_temperature_measurements',datetime.timedelta(days=7),1)):
+		print "commit day " + str(i) ##Debug
+		i = i+1
+	while (populate_index_table(c,'monthly_temperature_measurements','daily_hour_temperature_measurements',datetime.timedelta(days=30),1)):
 		print "commit day " + str(i) ##Debug
 		i = i+1
 	conn.commit()
