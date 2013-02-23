@@ -13,18 +13,18 @@ def query_range(c,table,start,end):
 	end_timestamp = time.mktime(end.timetuple())
 	c.execute('SELECT * from %s where date between %d and %d' % (table,start_timestamp,end_timestamp))
 	return c.fetchall()
-
-def populate_index_table(c,process_table,source_table,time_block):
-
+	
+def populate_index_table(c,process_table,source_table,time_block,expected_result_size):
 	start = get_date_of_last_entry(c,process_table)
 	if start is None:
 		#no entries currently exist in the index table
 		start = get_date_of_first_entry(c,source_table)
-	end = get_next_time_block(start,time_block)
-	if end < get_date_of_last_entry(c,source_table):
+		if start is None:
+			return False
+	end = start+time_block
+	if end+time_block < get_date_of_last_entry(c,source_table):
 		result = query_range(c,source_table,start,end)
-		# TODO: Rather than check the number of results returned we should check the time gap between the first and last record
-		if len(result) > 1:
+		if len(result) >= expected_result_size:
 			# did we query the raw table or and index table?
 			if len(result[0]) > 5:
 				process_index(c,process_table,result)
@@ -32,8 +32,10 @@ def populate_index_table(c,process_table,source_table,time_block):
 				process_raw(c,result)
 		else:
 			insert_null(c,process_table,end)
+			print 'missing data on %s, length: %s' % (end,len(result)) ##Debug
 		return True
 	else:
+		print 'end of data at %s' % end ##Debug
 		return False
 		
 def insert_null(c,table,end):
@@ -82,7 +84,11 @@ def process_raw(c,result):
 
 def get_date_of_first_entry(c,table):
 	c.execute('SELECT * from %s where date = (SELECT min(date) from %s)' % (table,table))
-	timestamp_tuple = datetime.datetime.fromtimestamp(c.fetchall()[0][0])
+	result = c.fetchall()
+	if len(result) == 0:
+		return None
+	else:
+		timestamp_tuple = datetime.datetime.fromtimestamp(result[0][0])
 	return timestamp_tuple
 	
 def get_date_of_last_entry(c,table):
@@ -93,22 +99,33 @@ def get_date_of_last_entry(c,table):
 	else:
 		timestamp_tuple = datetime.datetime.fromtimestamp(result[0][0])
 		return timestamp_tuple
-	
-def get_next_time_block(t,size):
-	delta = datetime.timedelta(**size)
-	return t+delta
-	
 
 def init():
 	conn = sqlite3.connect('temp.db')
 	c = conn.cursor()
 	i = 0
-	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',{'minutes':10})):
-		print "commit 10mins " + str(i)
+	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),20)):
+		print "commit 10mins " + str(i) ##Debug
 		i = i+1
 	i = 0
-	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',{'hours':1})):
-		print "commit hour " + str(i)
+	while (populate_index_table(c,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),3)):
+		print "commit hour " + str(i) ##Debug
+		i = i+1
+	i = 0
+	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),6)):
+		print "commit half_hour " + str(i) ##Debug
+		i = i+1
+	i = 0
+	while (populate_index_table(c,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),6)):
+		print "commit six_hour " + str(i) ##Debug
+		i = i+1
+	i = 0
+	while (populate_index_table(c,'twelve_hour_temperature_measurements','six_hour_temperature_measurements',datetime.timedelta(hours=12),2)):
+		print "commit twelve_hour " + str(i) ##Debug
+		i = i+1
+	i = 0
+	while (populate_index_table(c,'daily_temperature_measurements','twelve_hour_temperature_measurements',datetime.timedelta(days=1),2)):
+		print "commit day " + str(i) ##Debug
 		i = i+1
 	conn.commit()
 	conn.close()
