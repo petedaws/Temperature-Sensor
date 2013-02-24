@@ -14,13 +14,14 @@ def query_range(c,table,start,end):
 	c.execute('SELECT * from %s where date between %d and %d' % (table,start_timestamp,end_timestamp))
 	return c.fetchall()
 	
-def populate_index_table(c,process_table,source_table,time_block,min_result_size):
-	start = get_date_of_last_entry(c,process_table)
+def populate_index_table(c,process_table,source_table,start,time_block,min_result_size):
+	if start is None:
+		start = get_date_of_last_entry(c,process_table)
 	if start is None:
 		#no entries currently exist in the index table
 		start = get_date_of_first_entry(c,source_table)
 		if start is None:
-			return False
+			return False,None
 	end = start+time_block
 	if end+time_block < get_date_of_last_entry(c,source_table):
 		result = query_range(c,source_table,start,end)
@@ -32,12 +33,12 @@ def populate_index_table(c,process_table,source_table,time_block,min_result_size
 				process_raw(c,result)
 			print '%s on: %s, length: %s' % (process_table,end,len(result)) ##Debug
 		else:
-			insert_null(c,process_table,end)
+			#insert_null(c,process_table,end)
 			print 'missing data for %s on %s, length: %s' % (process_table,end,len(result)) ##Debug
-		return True
+		return True,end
 	else:
 		print 'end of %s data at %s' % (process_table,end)##Debug
-		return False
+		return False,None
 		
 def insert_null(c,table,end):
 	c.execute('INSERT INTO %s VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % (
@@ -104,36 +105,91 @@ def get_date_of_last_entry(c,table):
 def init():
 	conn = sqlite3.connect('temp.db')
 	c = conn.cursor()
-	while (populate_index_table(c,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),10)):
-		None
+	start = None
+	index_incomplete = True 
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'ten_minute_temperature_measurements',
+													'raw_temperature_measurements',
+													start,
+													datetime.timedelta(minutes=10),
+													10)
 	conn.commit()
 	
-	while (populate_index_table(c,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),1)):
-		None
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'half_hour_temperature_measurements',
+													'ten_minute_temperature_measurements',
+													start,
+													datetime.timedelta(minutes=30),
+													1)
+	conn.commit()
+
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'hour_temperature_measurements',
+													'ten_minute_temperature_measurements',
+													start,
+													datetime.timedelta(hours=1),
+													1)
+	conn.commit()
+
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'six_hour_temperature_measurements',
+													'hour_temperature_measurements',
+													start,
+													datetime.timedelta(hours=6),
+													1)
+
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'twelve_hour_temperature_measurements',
+													'hour_temperature_measurements',
+													start,
+													datetime.timedelta(hours=12),
+													1)
 	conn.commit()
 	
-	while (populate_index_table(c,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),1)):
-		None
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'daily_temperature_measurements',
+													'hour_temperature_measurements',
+													start,
+													datetime.timedelta(days=1),
+													1)
 	conn.commit()
 	
-	while (populate_index_table(c,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),1)):
-		None
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'weekly_temperature_measurements',
+													'daily_temperature_measurements',
+													start,
+													datetime.timedelta(days=7),
+													1)
 	conn.commit()
-	
-	while (populate_index_table(c,'twelve_hour_temperature_measurements','six_hour_temperature_measurements',datetime.timedelta(hours=12),1)):
-		None
-	conn.commit()
-	
-	while (populate_index_table(c,'daily_temperature_measurements','twelve_hour_temperature_measurements',datetime.timedelta(days=1),1)):
-		None
-	conn.commit()
-	
-	while (populate_index_table(c,'weekly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=7),1)):
-		None
-	conn.commit()
-	
-	while (populate_index_table(c,'monthly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=30),1)):
-		None
+
+	start = None
+	index_incomplete = True
+	while index_incomplete:
+		index_incomplete,start = populate_index_table(c,
+													'monthly_temperature_measurements',
+													'daily_temperature_measurements',
+													start,
+													datetime.timedelta(days=30),
+													1)
 	conn.commit()
 	
 	conn.close()
