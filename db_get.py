@@ -14,7 +14,7 @@ def query_range(c,table,start,end):
 	c.execute('SELECT * from %s where date between %d and %d' % (table,start_timestamp,end_timestamp))
 	return c.fetchall()
 	
-def populate_index_table(c,process_table,source_table,start,time_block,min_result_size):
+def populate_index_table_block(c,process_table,source_table,start,time_block,min_result_size):
 	if start is None:
 		start = get_date_of_last_entry(c,process_table)
 	if start is None:
@@ -92,96 +92,29 @@ def get_date_of_last_entry(c,table):
 		timestamp_tuple = datetime.datetime.fromtimestamp(result[0][0])
 		return timestamp_tuple
 
-def init():
-	conn = sqlite3.connect('temp.db')
+def process_index_table(conn,process_table,source_table,time_block,min_result_size):
 	c = conn.cursor()
 	start = None
 	index_incomplete = True 
 	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'ten_minute_temperature_measurements',
-													'raw_temperature_measurements',
+		index_incomplete,start = populate_index_table_block(c,
+													process_table,
+													source_table,
 													start,
-													datetime.timedelta(minutes=10),
-													10)
+													time_block,
+													min_result_size)
 	conn.commit()
 	
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'half_hour_temperature_measurements',
-													'ten_minute_temperature_measurements',
-													start,
-													datetime.timedelta(minutes=30),
-													1)
-	conn.commit()
-
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'hour_temperature_measurements',
-													'ten_minute_temperature_measurements',
-													start,
-													datetime.timedelta(hours=1),
-													1)
-	conn.commit()
-
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'six_hour_temperature_measurements',
-													'hour_temperature_measurements',
-													start,
-													datetime.timedelta(hours=6),
-													1)
-
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'twelve_hour_temperature_measurements',
-													'hour_temperature_measurements',
-													start,
-													datetime.timedelta(hours=12),
-													1)
-	conn.commit()
-	
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'daily_temperature_measurements',
-													'hour_temperature_measurements',
-													start,
-													datetime.timedelta(days=1),
-													1)
-	conn.commit()
-	
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'weekly_temperature_measurements',
-													'daily_temperature_measurements',
-													start,
-													datetime.timedelta(days=7),
-													1)
-	conn.commit()
-
-	start = None
-	index_incomplete = True
-	while index_incomplete:
-		index_incomplete,start = populate_index_table(c,
-													'monthly_temperature_measurements',
-													'daily_temperature_measurements',
-													start,
-													datetime.timedelta(days=30),
-													1)
-	conn.commit()
-	
+def init():
+	conn = sqlite3.connect('temp.db')
+	process_index_table(conn,'ten_minute_temperature_measurements','raw_temperature_measurements',datetime.timedelta(minutes=10),10)
+	process_index_table(conn,'half_hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(minutes=30),1)
+	process_index_table(conn,'hour_temperature_measurements','ten_minute_temperature_measurements',datetime.timedelta(hours=1),1)
+	process_index_table(conn,'six_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=6),1)
+	process_index_table(conn,'twelve_hour_temperature_measurements','hour_temperature_measurements',datetime.timedelta(hours=12),1)
+	process_index_table(conn,'daily_temperature_measurements','hour_temperature_measurements',datetime.timedelta(days=1),1)
+	process_index_table(conn,'weekly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=7),1)
+	process_index_table(conn,'monthly_temperature_measurements','daily_temperature_measurements',datetime.timedelta(days=30),1)
 	conn.close()
 	
 if __name__ == "__main__":
