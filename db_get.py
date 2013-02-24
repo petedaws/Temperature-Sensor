@@ -33,22 +33,12 @@ def populate_index_table(c,process_table,source_table,start,time_block,min_resul
 				process_raw(c,result)
 			print '%s on: %s, length: %s' % (process_table,end,len(result)) ##Debug
 		else:
-			#insert_null(c,process_table,end)
 			print 'missing data for %s on %s, length: %s' % (process_table,end,len(result)) ##Debug
 		return True,end
 	else:
 		print 'end of %s data at %s' % (process_table,end)##Debug
 		return False,None
 		
-def insert_null(c,table,end):
-	c.execute('INSERT INTO %s VALUES ("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")' % (
-			table,
-			time.mktime(end.timetuple()),
-			'NULL','NULL','NULL','NULL',
-			'NULL','NULL','NULL','NULL',
-			'NULL','NULL','NULL','NULL',
-			'NULL','NULL','NULL','NULL',))
-
 def process_index(c,table,result):
 	s0_low = [i[3] for i in result]
 	s0_high = [i[4] for i in result]
