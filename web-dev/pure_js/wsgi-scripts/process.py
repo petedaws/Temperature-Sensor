@@ -5,11 +5,12 @@ import sqlite3
 
 def application(environ, start_response):
 	status = '200 OK'
-	conn = sqlite3.connect('temp.db')
+	conn = sqlite3.connect('/home/peter/Temperature-Sensor/temp.db')
 	c = conn.cursor()
 	
 	table = 'raw_temperature_measurements'
-	data = c.execute('SELECT * from %s' % (table))
+	c.execute('SELECT * from %s' % (table))
+	data = c.fetchall()
 	conn.close()
 	s0 = []
 	s1 = []
