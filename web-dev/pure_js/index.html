@@ -16,17 +16,9 @@ $(function() {
 			global: {
 			useUTC: false
 			}
-		});
-
-	$.ajax({
-  url: '/wsgi',
-  async: false,
-  dataType: 'json',
-  success: function (response) {
-    // do stuff with response.
-  }
-}).pipe(function(obj) {
-		$.each(obj, function(name, data) {
+		})
+	$.getJSON('/wsgi', function(response) {
+		$.each(response, function(name, data) {
 			seriesOptions[seriesCounter] = {
 				name: name,
 				data: data,
@@ -36,17 +28,17 @@ $(function() {
 				}
 			};
 			seriesCounter++;
-			if (seriesCounter == Object.keys(obj).length) {
+			if (seriesCounter == Object.keys(response).length) {
 				createChart();
 			};
 		});
-	});
+	})
 
 	// create the chart when all data is loaded
 	function createChart() {
 
 		// Create the chart
-		var chart = new Highcharts.StockChart({
+		chart = new Highcharts.StockChart({
 		    chart: {
 		        renderTo: 'container',
 				events: {
@@ -58,6 +50,10 @@ $(function() {
 				zoomType: 'x'
 		    },
 
+			navigator : {
+				adaptToUpdatedData: false,
+				series : seriesOptions
+			},
 
 		plotOptions: {
 	    		line: {
@@ -99,7 +95,10 @@ $(function() {
 				}
 			},
 			xAxis: {
-				ordinal: false
+				ordinal: false,
+				events : {
+					afterSetExtremes : afterSetExtremes
+				},
 			},
 	
 		    title: {
@@ -112,6 +111,27 @@ $(function() {
 	}
 });
 
+/**
+ * Load new data depending on the selected min and max
+ */
+function afterSetExtremes(e) {
+
+	var url,
+		currentExtremes = this.getExtremes(),
+		range = e.max - e.min;
+	console.log("test");
+	chart.showLoading('Loading data from server...');
+	$.getJSON('/wsgi?start='+ Math.round(e.min) +
+			'&end='+ Math.round(e.max), function(response) {
+		for (i = 0; i< chart.series.length; ++i){
+			if (response[chart.series[i].name] !== undefined){
+				chart.series[i].setData(response[chart.series[i].name])
+			}
+		}
+		chart.hideLoading();
+	});
+}
+
 		</script>
 	</head>
 	<body>
@@ -121,3 +141,4 @@ $(function() {
 <div id="container" style="height: 500px; min-width: 500px"></div>
 	</body>
 </html>
+

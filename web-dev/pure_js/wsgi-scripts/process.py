@@ -2,14 +2,22 @@ import time
 import datetime
 import json
 import sqlite3
+import pprint
+import cgi
 
 def application(environ, start_response):
 	status = '200 OK'
-	conn = sqlite3.connect('/home/peter/Temperature-Sensor/temp.db')
+	input_data = cgi.parse_qs(environ['QUERY_STRING'])
+	conn = sqlite3.connect('C:\\Program Files\\Apache Software Foundation\\Apache2.2\\htdocs\\wsgi-scripts\\temp.db')
 	c = conn.cursor()
 	
-	table = 'raw_temperature_measurements'
-	c.execute('SELECT * from %s' % (table))
+	if 'start' in input_data and 'end' in input_data:
+		table = 'ten_minute_temperature_measurements'
+		query = 'SELECT * from %s where date between %d and %d' % (table,int(input_data['start'][0]),int(input_data['end'][0]))
+	else:
+		table = 'hour_temperature_measurements'
+		query = 'SELECT * from %s' % (table)
+	c.execute(query)
 	data = c.fetchall()
 	conn.close()
 	pivot = zip(*data)
