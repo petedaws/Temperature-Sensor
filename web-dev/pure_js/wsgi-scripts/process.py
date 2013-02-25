@@ -10,7 +10,7 @@ def application(environ, start_response):
 	
 	table = 'raw_temperature_measurements'
 	data = c.execute('SELECT * from %s' % (table))
-
+	conn.close()
 	s0 = []
 	s1 = []
 	s2 = []
