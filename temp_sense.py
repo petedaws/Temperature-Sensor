@@ -48,10 +48,12 @@ def main(logname,ave_window):
 		if len(temps) > ave_window:
 			average_result = average(temps)
 			log = open(logname,'a')
-			tm = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
+			t = time.localtime()
+			tm = time.strftime('%Y-%m-%d %H:%M:%S',t)
+			ts = time.mktime(t)
 			log.write("".join((tm,',',",".join("%0.1f" % x for x in average_result),'\n')))
 			log.close()
-			c.execute("INSERT INTO raw_temperature_measurements VALUES (%d,%0.1f,%0.1f,%0.1f,%0.1f)" % (int(tm),average_result[0],average_result[1],average_result[2],average_result[3])))
+			c.execute("INSERT INTO raw_temperature_measurements VALUES (%d,%0.1f,%0.1f,%0.1f,%0.1f)" % (int(ts),average_result[0],average_result[1],average_result[2],average_result[3]))
 			conn.commit()
 			temps = []
 	conn.close()
