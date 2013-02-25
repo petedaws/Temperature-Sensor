@@ -1,21 +1,24 @@
-import csv
 import time
 import datetime
 import json
+import sqlite3
 
 def application(environ, start_response):
 	status = '200 OK'
+	conn = sqlite3.connect('temp.db')
+	c = conn.cursor()
 	
-	csvrdr  = csv.reader(open('/home/peter/Temperature-Sensor/temp.csv','rb'))
+	table = 'raw_temperature_measurements'
+	data = c.execute('SELECT * from %s' % (table))
 
 	s0 = []
 	s1 = []
 	s2 = []
 	s3 = []
 
-	for row in csvrdr:
+	for row in data:
 
-		s = time.mktime(datetime.datetime.strptime(row[0],'%Y-%m-%d %H:%M:%S').timetuple())
+		s = row[0]
 		s0.append([(long(s)*1000),float(row[1])])
 		s1.append([(long(s)*1000),float(row[2])])
 		s2.append([(long(s)*1000),float(row[3])])
