@@ -51,7 +51,7 @@ def main(logname,ave_window):
 			tm = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime())
 			log.write("".join((tm,',',",".join("%0.1f" % x for x in average_result),'\n')))
 			log.close()
-			c.execute("INSERT INTO raw_temperature_measurements VALUES (%d,%f,%f,%f,%f)" % (int(tm),average_result[0],average_result[1],average_result[2],average_result[3])))
+			c.execute("INSERT INTO raw_temperature_measurements VALUES (%d,%0.1f,%0.1f,%0.1f,%0.1f)" % (int(tm),average_result[0],average_result[1],average_result[2],average_result[3])))
 			conn.commit()
 			temps = []
 	conn.close()
