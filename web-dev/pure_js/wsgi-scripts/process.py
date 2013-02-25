@@ -12,19 +12,13 @@ def application(environ, start_response):
 	c.execute('SELECT * from %s' % (table))
 	data = c.fetchall()
 	conn.close()
-	s0 = []
-	s1 = []
-	s2 = []
-	s3 = []
+	pivot = zip(*data)
+	s0 = zip(pivot[0],pivot[1])
+	s1 = zip(pivot[0],pivot[2])
+	s2 = zip(pivot[0],pivot[3])
+	s3 = zip(pivot[0],pivot[4])
 
-	for row in data:
-
-		s = row[0]
-		s0.append([(long(s)*1000),float(row[1])])
-		s1.append([(long(s)*1000),float(row[2])])
-		s2.append([(long(s)*1000),float(row[3])])
-		s3.append([(long(s)*1000),float(row[4])])
-		data = {'Outside':s0,'Kitchen':s1,'Ceiling':s2,'Study':s3}
+	data = {'Outside':s0,'Kitchen':s1,'Ceiling':s2,'Study':s3}
 	output = json.dumps(data)
 
 	response_headers = [('Content-type', 'text/plain'), ('Content-Length', str(len(output)))]
