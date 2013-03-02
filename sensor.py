@@ -11,7 +11,7 @@ class sensor:
 		self.name = name
 		self.id = id
 	
-	def get_range(self, start, end):
+	def get_data(self, start, end, min_resolution):
 		start_timestamp = time.mktime(start.timetuple())
 		end_timestamp = time.mktime(end.timetuple())
 		c.execute('SELECT * from %s where date between %d and %d' % (table,start_timestamp,end_timestamp))
