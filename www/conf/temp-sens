@@ -1,50 +1,29 @@
-<VirtualHost *:80>
+Listen 8020
+<VirtualHost *:8020>
 	ServerAdmin webmaster@localhost
 
-	DocumentRoot /var/www
-	<Directory />
-		Options FollowSymLinks
-		AllowOverride None
-	</Directory>
-	<Directory /var/www/>
-		Options Indexes FollowSymLinks MultiViews
-		AllowOverride None
+	DocumentRoot /opt/Temperature-Sensor/www/html
+
+	<Directory /opt/Temperature-Sensor/www/html>
+		AuthType Basic
+		AuthName "Temperature-Sensor Restricted Access"
+		AuthUserFile /opt/Temperature-Sensor/www/htpasswd
+		Require valid-user
+		SetEnvIf Request_URI "^/favicon.ico$" allow
 		Order allow,deny
-		allow from all
+		Allow from env=allow
+		Satisfy Any
 	</Directory>
 
-	WSGIScriptAlias /wsgi /var/www/wsgi-scripts/process.py
+	ScriptAlias /wsgi /opt/Temperature-Sensor/www/wsgi-scripts/process.wsgi
 
-	<Directory "/var/www/wsgi-scripts">
-		AllowOverride None
-		Options None
-		Order deny,allow
-		Allow from all
-	</Directory>
-
-	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
-	<Directory "/usr/lib/cgi-bin">
-		AllowOverride None
-		Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+	<Directory /opt/Temperature-Sensor/www/wsgi-scripts>
+		AddHandler wsgi-script .wsgi
+		AuthType Basic
+		AuthName "Temperature-Sensor"
+		AuthUserFile /opt/Temperature-Sensor/www/htpasswd
+		Require valid-user
 		Order allow,deny
 		Allow from all
 	</Directory>
-
-	ErrorLog ${APACHE_LOG_DIR}/error.log
-
-	# Possible values include: debug, info, notice, warn, error, crit,
-	# alert, emerg.
-	LogLevel warn
-
-	CustomLog ${APACHE_LOG_DIR}/access.log combined
-
-    Alias /doc/ "/usr/share/doc/"
-    <Directory "/usr/share/doc/">
-        Options Indexes MultiViews FollowSymLinks
-        AllowOverride None
-        Order deny,allow
-        Deny from all
-        Allow from 127.0.0.0/255.0.0.0 ::1/128
-    </Directory>
-
 </VirtualHost>
