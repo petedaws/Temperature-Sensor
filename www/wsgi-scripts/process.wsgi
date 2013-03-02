@@ -45,7 +45,7 @@ def get_date_of_last_entry(c,table):
 def application(environ, start_response):
 	status = '200 OK'
 	input_data = cgi.parse_qs(environ['QUERY_STRING'])
-	conn = sqlite3.connect(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','temp.db')
+	conn = sqlite3.connect(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','temp.db'))
 	c = conn.cursor()
 	
 	if 'start' in input_data and 'end' in input_data:

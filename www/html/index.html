@@ -119,7 +119,6 @@ function afterSetExtremes(e) {
 	var url,
 		currentExtremes = this.getExtremes(),
 		range = e.max - e.min;
-	console.log("test");
 	chart.showLoading('Loading data from server...');
 	$.getJSON('/wsgi?start='+ Math.round(e.min) +
 			'&end='+ Math.round(e.max), function(response) {
