@@ -4,6 +4,7 @@ import json
 import sqlite3
 import pprint
 import cgi
+import os
 
 def get_resolve_query(start,end):
 	start_ts = datetime.datetime.fromtimestamp(start)
@@ -44,7 +45,7 @@ def get_date_of_last_entry(c,table):
 def application(environ, start_response):
 	status = '200 OK'
 	input_data = cgi.parse_qs(environ['QUERY_STRING'])
-	conn = sqlite3.connect('C:\\Program Files\\Apache Software Foundation\\Apache2.2\\htdocs\\wsgi-scripts\\temp.db')
+	conn = sqlite3.connect(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..','..','temp.db')
 	c = conn.cursor()
 	
 	if 'start' in input_data and 'end' in input_data:
