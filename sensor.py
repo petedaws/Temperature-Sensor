@@ -1,6 +1,7 @@
 import time
 import datetime
 from database import database
+from serialport import serial_reactor
 
 SENSOR_INDEX_LEVELS = [30,10*60,30*60,60*60,6*60*60,12*60*60,24*60*60,7*60*60]
 
@@ -25,7 +26,7 @@ class sensor:
 		ts = time.mktime(t)
 		database.add_record({
 						'table_name':self.name+'_raw',
-						'values':[int(ts),data[id]+self.__calibration_factor]})
+						'values':[int(ts),data[self.id]+self.__calibration_factor]})
 		
 	def __init_database(self):
 		# create the raw data table

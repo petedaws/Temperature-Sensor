@@ -18,15 +18,16 @@ class Database:
 
 	def create_table(self,table_details):
 		c = self.conn.cursor()
-		if not table_exists(table_details):
-			columns = ','.join([' '.join([i[0],i[1]]) for i in table_details['columns']])
+		if not self.table_exists(table_details):
+			columns = ','.join([' '.join([i[0],i[1]]) for i in table_details['table_columns']])
 			c.execute('CREATE TABLE %s (%s)' % (table_details['table_name'],columns))
 			self.conn.commit()
 
 	def add_record(self,record):
-		values = ','.join(record['values'])
+		c = self.conn.cursor()
+		values = ','.join([str(val) for val in record['values']])
 		c.execute("INSERT INTO %s VALUES (%s)" % (record['table_name'],values))
-		conn.commit()
+		self.conn.commit()
 
 
 database = Database('test.db')

@@ -1,6 +1,7 @@
 #! /usr/bin/python
-
+import platform
 import serial
+import string
 
 class Serial_Reactor:
 
@@ -33,8 +34,9 @@ class Serial_Reactor:
 		return average_result
 	
 	def run(self):
+		temps = []
 		while(True):
-			tempstr = serialport.readline(None).strip()
+			tempstr = self.__serialport.readline(None).strip()
 			if not all(c in string.printable for c in tempstr):
 				continue
 			try:
