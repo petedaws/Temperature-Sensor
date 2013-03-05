@@ -1,4 +1,4 @@
-from serial import serial_reactor
+from serialport import serial_reactor
 from sensor import sensor
 
 sensors = [
