@@ -28,6 +28,7 @@ class Database:
 		c.execute("INSERT INTO %s VALUES (%s)" % (record['table_name'],values))
 		conn.commit()
 
+
 database = Database('test.db')
 		
 if __name__ == '__main__':

@@ -44,7 +44,7 @@ class Serial_Reactor:
 				continue
 				
 			if len(temps) > self.__ave_window:
-				self.trigger_event('sensor_reading',{'data':self.__average(temps)})
+				self.trigger_event('sensor_reading',self.__average(temps))
 				temps = []
 
 
