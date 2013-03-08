@@ -37,7 +37,7 @@ class Database:
 		
 
 
-database = Database('test.db')
+database = Database('temp.db')
 		
 if __name__ == '__main__':
 	assert not database.table_exists({'table_name':'rww'})
