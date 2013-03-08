@@ -26,7 +26,7 @@ class sensor:
 		ts = time.mktime(t)
 		database.add_record({
 						'table_name':self.name+'_raw',
-						'values':[int(ts),data[self.id]+self.__calibration_factor]})
+						'values':[int(ts),"%0.1f" % (data[self.id]+self.__calibration_factor)]})
 		
 	def __init_database(self):
 		# create the raw data table
