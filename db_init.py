@@ -59,7 +59,7 @@ def init_names(c):
 	c.execute('INSERT INTO sensor_names VALUES ("%s","%s")' % ('s0','Outside'))
 	c.execute('INSERT INTO sensor_names VALUES ("%s","%s")' % ('s1','Kitchen'))
 	c.execute('INSERT INTO sensor_names VALUES ("%s","%s")' % ('s2','Ceiling'))
-	c.execute('INSERT INTO sensor_names VALUES ("%s","%s")' % ('s0','Study'))
+	c.execute('INSERT INTO sensor_names VALUES ("%s","%s")' % ('s3','Study'))
 			 
 			 
 def init():
