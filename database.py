@@ -15,6 +15,11 @@ class Database:
 			return True
 		else:
 			return False
+			
+	def list_tables(self):
+		c = self.conn.cursor()
+		c.execute('SELECT name FROM sqlite_master WHERE type="table"')
+		return c.fetchall()
 
 	def create_table(self,table_details):
 		c = self.conn.cursor()
@@ -35,9 +40,6 @@ class Database:
 		c.execute(query)
 		return c.fetchall()
 		
-
-
-database = Database('temp.db')
 		
 if __name__ == '__main__':
 	assert not database.table_exists({'table_name':'rww'})

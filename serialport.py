@@ -56,11 +56,6 @@ class Serial_Reactor:
 		if event_name in self.__events:
 			for cb in self.__events[event_name]:
 				cb(*args)
-	
-if platform.system() == 'Windows':
-	serial_reactor = Serial_Reactor('COM7',300)
-else:
-	serial_reactor = Serial_Reactor('/dev/ttyUSB0',300)
 
 
 
