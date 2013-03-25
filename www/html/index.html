@@ -5,7 +5,9 @@
 		<title>Temperature Monitor</title>
 
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<p>
 		<script type="text/javascript">
+var chart = null;
 $(function() {
 
 	var seriesOptions = [],
@@ -30,6 +32,7 @@ $(function() {
 			seriesCounter++;
 			if (seriesCounter == Object.keys(response).length) {
 				createChart();
+				createElements();
 			};
 		});
 	})
@@ -131,7 +134,33 @@ function afterSetExtremes(e) {
 	});
 }
 
+function showhideSeries(s_name,s) {
+	if (document.getElementById(s_name).checked) {
+		chart.series[s].show();
+	} else {
+		chart.series[s].hide();
+	}
+}
+
+function createElements() {
+	var buttonarea = document.getElementById('buttonarea')
+	for(i = 0; i < chart.series.length -1; ++i){
+		var para = document.createElement('p');
+		var label = document.createElement('label');
+		var button = document.createElement('input');
+		button.setAttribute("type",'checkbox');
+		button.setAttribute("onclick","showhideSeries('" + chart.series[i].name + "'," + i + ")");
+		button.setAttribute("id",chart.series[i].name);
+		button.setAttribute("checked",true);
+		label.appendChild(button)
+		label.appendChild(document.createTextNode(chart.series[i].name));
+		para.appendChild(label)
+		buttonarea.appendChild(para);
+	}
+}
 		</script>
+	<p id='buttonarea'>
+	</p>
 	</head>
 	<body>
 <script src="http://code.highcharts.com/stock/highstock.js"></script>
