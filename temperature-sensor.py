@@ -1,6 +1,7 @@
 from serialport import Serial_Reactor
 from sensor import Sensor
 from database import Database
+import platform
 
 if __name__ == '__main__':
 	db = Database('temp.db')
