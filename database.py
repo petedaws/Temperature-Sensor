@@ -31,12 +31,13 @@ class Database:
 	def add_record(self,record,commit=True):
 		c = self.conn.cursor()
 		values = ','.join([str(val) for val in record['values']])
-		c.execute("INSERT INTO %s VALUES (%s)" % (record['table_name'],values))
+		query = "INSERT INTO %s VALUES (%s)" % (record['table_name'],values)
+		c.execute(query)
 		if commit:
 			try:
 				self.conn.commit()
 			except sqlite3.OperationalError as e:
-				print 'sqlite3 error:',e
+				print 'sqlite3 error:',e,query
 			
 	def select(self,query):
 		c = self.conn.cursor()
