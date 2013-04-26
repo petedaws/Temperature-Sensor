@@ -33,8 +33,11 @@ class Database:
 		values = ','.join([str(val) for val in record['values']])
 		c.execute("INSERT INTO %s VALUES (%s)" % (record['table_name'],values))
 		if commit:
-			self.conn.commit()
-		
+			try:
+				self.conn.commit()
+			except sqlite3.OperationalError as e:
+				print 'sqlite3 error:',e
+			
 	def select(self,query):
 		c = self.conn.cursor()
 		c.execute(query)
